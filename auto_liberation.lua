@@ -26,3 +26,4 @@ DCS.setUserCallbacks({
     onMissionEnd = on_end
 })
 
+
