@@ -1,11 +1,12 @@
--- Auto-Loader: startet nach Missionsende den Liberation-Generator
-
-local function onSimulationStop()
-    net.send_chat_to("🔄 Generiere nächste Liberation-Mission...", 0)
-    -- Pfad anpassen: hier liegt dein Batch
-    os.execute('start "" "C:\\Repos\\DCS_server_skripts\\batch\\generate_mission.bat"')
+local function auto_load()
+    net.log("Liberation AutoLoader: Versuche Mission zu laden...")
+    local miz = "C:\\DCS Server Liberation\\dcs_liberation.13.0.0\\next.miz"
+    if lfs.attributes(miz) then
+        net.load_mission(miz)
+        net.log("Liberation AutoLoader: Mission geladen -> " .. miz)
+    else
+        net.log("Liberation AutoLoader: Konnte next.miz nicht finden!")
+    end
 end
 
-DCS.setUserCallbacks({
-    onSimulationStop = onSimulationStop
-})
+DCS.setUserCallbacks({ onSimulationStart = auto_load })
