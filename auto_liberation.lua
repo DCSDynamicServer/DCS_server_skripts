@@ -13,17 +13,29 @@ local function load_next()
     if lfs.attributes(miz) then
         log("Liberation AutoLoader: Lade " .. miz)
         net.load_mission(miz)
+        return true
     else
-        log("Liberation AutoLoader: Konnte next.miz nicht finden!")
+        log("Liberation AutoLoader: next.miz noch nicht gefunden.")
+        return false
     end
 end
 
 local function on_end()
     log("Liberation AutoLoader: Mission beendet, starte Liberation-CLI ...")
     os.execute('cmd /c "C:\\DCS Server Liberation\\dcs_liberation.13.0.0\\liberation_next_turn.bat"')
-    log("Liberation AutoLoader: Warte 40 Sekunden, bevor next.miz geladen wird ...")
-    os.execute("ping -n 40 127.0.0.1 > nul")
-    load_next()
+
+    log("Liberation AutoLoader: Warte auf neue next.miz (max 120 Sekunden) ...")
+    local success = false
+    for i = 1, 12 do  -- 12 Versuche à 10 Sekunden = 120 Sekunden
+        os.execute("ping -n 10 127.0.0.1 > nul") -- 10 Sekunden warten
+        if load_next() then
+            success = true
+            break
+        end
+    end
+    if not success then
+        log("Liberation AutoLoader: Keine neue Mission gefunden, Abbruch nach 120 Sekunden!")
+    end
 end
 
 DCS.setUserCallbacks({
